@@ -1,0 +1,39 @@
+#NEVER COMMIT PROD SENSITIVE INFORMATION ON THIS FILE.
+#USERNAME, PASSWORD, KEYS SHOULD BE SET AS BLANK AND DEFINED ON CD PIPELINE
+
+salesforce.api:
+  host: "uhcmira.my.salesforce.com"
+  basePath: "/services/data/v50.0/sobjects"
+  queryBasePath: "/services/data/v50.0/query"
+  
+oauth.jwt:
+  consumerKey: "![+Le0PvttIngbAm+jFFWz2w3mfjrSJsLd2Gzw5cb1b89+WOSlkVFtbEbyX03daqNJV25JeasUcs6eXnG45lKPeTmf9PaNzJ8lkHr+CwmUY9T57ziP9kpMfvUwd+PHXgwe]"
+  principal: "![2BJ2ZV+bsV5eWbrEkz6+bozqE73TSgf1Lc51OnUVpZm9Qu/BhT5J+TwEY4WpnJ9L]"
+  tokenHostOnly: "https://login.salesforce.com"
+  keystorePath: "keys/govt-prg-crm-api.optum.com.jks"
+  keystorePassword: "![c0JaeMmyAmlx0ry3xTp66VSRNgx6c+FNBHdlPUrDeG8=]"
+  privateKeyAlias: "![YRp6ebnyzmn5FApduvosouxubO3loiQkXMGthNb+CQY=]"
+  privateKeyPassword: "![c0JaeMmyAmlx0ry3xTp66VSRNgx6c+FNBHdlPUrDeG8=]"
+  
+# AUTODISCOVERY    
+api:
+  id: "20493453"   
+  
+# Booking lead time in hours applied to slot availability and appointment submission.
+appointment:
+  leadTimeHours: "48"
+
+# SMS API OAuth Configuration
+sms:
+  oauth:
+    host: "api.uhg.com"
+    basePath: "/"
+    clientId: "![YOUR_CLIENT_ID_ENCRYPTED]"
+    clientSecret: "![YOUR_CLIENT_SECRET_ENCRYPTED]"
+    scope: "https://api.uhg.com/.default"
+    tokenUrl: "https://api.uhg.com/oauth2/token"
+  api:
+    host: "api.uhg.com"
+    basePath: "/api/consumer/gpd-sms-mgr/v1.0/sms/outbound"
+    upstreamEnv: "prod"
+

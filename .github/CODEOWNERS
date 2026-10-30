@@ -1,0 +1,10 @@
+# Default ownership
+* @pgupt46_uhg @sjetty2_uhg @kvallako_uhg
+
+# Mule implementation files
+src/main/mule/** @pgupt46_uhg @sjetty2_uhg @kvallako_uhg
+src/main/resources/** @pgupt46_uhg @sjetty2_uhg @kvallako_uhg
+
+# CI and repo policy files
+.github/** @pgupt46_uhg @sjetty2_uhg @kvallako_uhg
+AGENTS.md @pgupt46_uhg @sjetty2_uhg @kvallako_uhg

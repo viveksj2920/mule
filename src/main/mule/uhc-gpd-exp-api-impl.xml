@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:core="http://www.mulesoft.org/schema/mule/core"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<flow name="salesforce-calls-api-implFlow-getCallByUCID" doc:id="7a470e9e-00ce-4210-a48e-ea55e08d2531" >
+<!-- 		<http:request method="PUT" doc:name="Process API" doc:id="182d7c36-ed08-4cb9-b49e-7de28b97a0d2" config-ref="HTTP_Request_Live_Person_Prc_API" path="/activities/{activityId}"> -->
+<!-- 			<http:uri-params ><![CDATA[#[output application/java -->
+<!-- -&#45;&#45; -->
+<!-- { -->
+<!-- 	activityId : vars.queryParams -->
+<!-- }]]]></http:uri-params> -->
+<!-- 		</http:request> -->
+		
+		<salesforce:query doc:name="Query-Call-By_ucid" doc:id="ca4062f3-362d-455b-b414-10cccb429308"  headers='#[{"QueryOptions": {"batchSize": 200}}]' config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT
+  ENT_CallUUID__c,
+  Call_Outcome_Disposition__c,
+  ActivityDate,
+  ENT_InvocaCallingPage__c,
+  Shopper_Profile_Id__c,
+  Marketing_ID_PSC__c,
+  Adobe_Id__c,
+  ENT_ToAddress__c,
+  ENT_FromAddress__c,
+  Temp_To_Address_TFN__c
+  
+FROM
+  Task
+WHERE
+
+   ENT_CallUUID__c = :ucid]]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	"ucid" : " '" ++ attributes.uriParams[0] ++ "' "
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="436bd7c6-3c33-435a-a75d-9f18e98be66e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="getCallByUCID" doc:id="f3ec0095-8640-4314-99f1-79e63de223f1" message="getCallByUCID completed"/>
+	</flow>
+	<!-- [STUDIO:"uhc-gpd-exp-api-impl:put-create-appointment"]<flow name="uhc-gpd-exp-api-impl:put-create-appointment" doc:id="1e583138-c2f3-4045-b497-74f8d0f5b133">
+		<set-variable value="#[!isEmpty(payload.firstName default '') and&#10;!isEmpty(payload.lastName default '') and&#10;!isEmpty(payload.emailAddress default '') and&#10;!isEmpty(payload.zipCode default '') and&#10;!isEmpty(payload.dateOfBirth default '') and&#10;!isEmpty(payload.phoneNumber default '') and&#10;!isEmpty(payload.phoneType default '') and&#10;!isEmpty(payload.appointmentDate default '') and&#10;!isEmpty(payload.appointmentTime default '')&#93;" doc:name="Set Variable" doc:id="af710b8c-60eb-4b41-9868-9e3d0eb87676" variableName="isMandatoryFieldsPresent" />
+		<choice doc:name="Mandatory Fields Present?" doc:id="560f82eb-5434-4b5d-b13d-b0e47e7dc10f" >
+			<when expression='#[vars.isMandatoryFieldsPresent == true or vars.isMandatoryFieldsPresent == "true"&#93;'>
+				<flow-ref doc:name="Flow Reference" doc:id="c16c2f53-e044-415f-93e1-4722baa8fb33" name="createAppointment-subflow"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="4d27f45d-28b4-462a-ba88-e6b015af758f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+"message": "Request received does not contain mandatory fields" &#93;&#93;></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+attributes.statusCode&#93;&#93;></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+    </flow> [STUDIO] -->
+	<sub-flow xmlns:core="http://www.mulesoft.org/schema/mule/core" name="createAppointment-subflow" doc:id="0e8987b2-9207-4980-afcd-00b6093dbb4a" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<set-variable value="${secure::appointment.leadTimeHours}" doc:name="Set leadTimeHours" doc:id="6a4d2b18-9c73-4e50-81af-2d7b6e30c495" variableName="leadTimeHours" />
+		<ee:transform doc:name="Evaluate lead time" doc:id="5b1f0c34-9a77-4d21-8c0e-2f9a1b7c4d10">
+			<ee:variables>
+				<ee:set-variable variableName="leadTimeCheck" resource="dwl/createAppointment/leadTimeCheck.dwl" />
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="Lead time satisfied?" doc:id="c7a2e5d1-3f68-4b0a-9d54-8e1c6a4f2b93">
+			<when expression="#[vars.leadTimeCheck.isViolation]">
+				<ee:transform doc:name="Lead time error payload" doc:id="d4e8b2f9-16c3-4a7e-b5d0-9c3f7a1e6082">
+					<ee:message>
+						<ee:set-payload resource="dwl/createAppointment/leadTimeError.dwl" />
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[400]" doc:name="Set httpStatus 400" doc:id="a1c9d3e7-52b4-48f1-9e6a-7b2d0c5f4a18" variableName="httpStatus" />
+				<set-variable value='#["HTTP:BAD_REQUEST"]' doc:name="Set errorType" doc:id="f3b7a0d2-6e51-4c98-8a2f-1d9e4b6c7503" variableName="errorType" />
+				<logger level="INFO" doc:name="Log lead time rejection" doc:id="b8d1f6a4-0c37-4e29-95b6-3a7c2e8d1f40" message='#["createAppointment rejected: requested date/time is inside the configured lead time of " ++ vars.leadTimeCheck.leadTimeHours ++ " hours"]' />
+			</when>
+			<otherwise>
+		<ee:transform doc:name="Bulid Request" doc:id="94d9d980-0b95-49ef-b05a-f716f709e1f1">
+			<ee:message>
+				<ee:set-payload resource="dwl/createAppointment/buildRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[now()]" doc:name="Set Variable" doc:id="fa0cfd08-c769-4977-b9b2-0af425d1cd2e" variableName="startTimeBeforeCreateSFcall"/>
+		<salesforce:create doc:name="Create" doc:id="397e39ed-6458-4513-8666-a1fb62346f6f" config-ref="Salesforce_Config" type="CDAS_Appointment_Intake_Request__c">
+		</salesforce:create>
+		<logger level="INFO" doc:name="Logger" doc:id="e4d8add0-7277-449b-b4f6-f2993bfe589d" message='#[output application/java&#10;---&#10;"createAppointment time after SF Create Call is :  " ++ (now() - vars.startTimeBeforeCreateSFcall)]'/>
+		<choice doc:name="Appointment Created?" doc:id="7aea3ad8-29e7-4686-ad67-faff12dc1baf">
+			<when expression="#[payload.successful ~= true]">
+				<ee:transform doc:name="Response Payload" doc:id="a17324b2-37a9-46a6-990a-2f764045ae40">
+					<ee:message>
+						<ee:set-payload resource="dwl/createAppointment/createOppurtunityResponse.dwl" />
+					</ee:message>
+		</ee:transform>
+				<set-variable value="#[201]" doc:name="Set Variable httpStatusCode=201" doc:id="3810ec8c-6121-4be7-9c40-4538b0ed7f52" variableName="httpStatus" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Not Found Payload" doc:id="e7014f27-664c-43e4-87ae-8fea5347dab8">
+					<ee:message>
+						<ee:set-payload resource="dwl/createAppointment/createOppurtunityError.dwl" />
+					</ee:message>
+					
+				</ee:transform>
+				<set-variable variableName="httpStatus" value='#[var sfCode = upper(payload.items[0].payload.errors[0].statusCode default "")
+    var badRequestErrors = [
+        "REQUIRED_FIELD_MISSING",
+        "STRING_TOO_LONG",
+        "DUPLICATES_DETECTED",
+        "MALFORMED_ID",
+        "NUMBER_OUTSIDE_VALID_RANGE",
+        "FIELD_CUSTOM_VALIDATION_EXCEPTION"
+    ]
+    ---
+    if (
+        (sfCode contains "INVALID") or
+        ((badRequestErrors contains sfCode) default false)
+    )
+        400
+    else
+        500]' />
+				<set-variable
+    variableName="httpStatus"
+    value="#[payload.statusCode]"
+    doc:name="Set Variable httpStatus"/>
+    <set-variable variableName="errorType" value='#[if ((payload.statusCode default 500) == 400)
+                "HTTP:BAD_REQUEST"
+              else
+                "HTTP:INTERNAL_SERVER_ERROR"]' doc:name="Set Variable ErrorType"/>
+			</otherwise>
+			</choice>
+			</otherwise>
+		</choice>
+	
+</sub-flow>
+<sub-flow name="salesforce-sys-slot-availability-subflow" doc:id="7a0ba39a-aee3-4e20-a7a0-bbb06b845216" >
+  <logger level="INFO" doc:name="Logger before sf query call" doc:id="6e6128cb-73ff-4542-bfaf-706f94b3754b" message='#["Initiating Sf query call"]' />
+  <try doc:name="Try" doc:id="07a41394-c33f-47bb-af94-b8af85386cfb" >
+   <salesforce:query doc:name="Query-appointments" doc:id="835eeb71-dddb-49d0-8125-29028cd3ceca" config-ref="Salesforce_Config" headers='#[{"QueryOptions": {"batchSize": 200}}]'>
+   <salesforce:salesforce-query><![CDATA[SELECT Id, Appointment_Date__c, Appointment_Time__c, Balance_Planned_Capacity__c FROM CDAS_Slot_Master__c where Appointment_Date__c >= :startdate and Appointment_Date__c <= :enddate and Balance_Planned_Capacity__c > 0 order by Appointment_Date__c asc]]></salesforce:salesforce-query>
+   <salesforce:parameters><![CDATA[#[output application/json
+---
+{
+ "enddate" : vars.vQParams.endDate as Date,
+ "startdate": vars.vQParams.effectiveStartDate as Date
+ }]]]></salesforce:parameters>
+  </salesforce:query>
+   <ee:transform doc:name="Map output response" doc:id="13e0d52b-2ed3-44a5-82c0-e837ed45d172">
+   <ee:message>
+     <ee:set-payload resource="dw/responseMap.dwl" />
+   </ee:message>
+  </ee:transform>
+   <logger level="INFO" doc:name="Logger after sf query call" doc:id="16ba66b7-6fc6-4c69-82bc-c84c5ece437d" message='#["Sf query call completed"]' />
+   <error-handler >
+    <on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="dc159191-8155-45fb-b094-4bc9b5284a87" >
+     <ee:transform doc:name="Error message" doc:id="b98e83e8-3efc-4836-819b-4463638bbbd4" >
+      <ee:message >
+       <ee:set-payload resource="dw/errorResponse500.dwl" />
+      </ee:message>
+     </ee:transform>
+     <logger level="ERROR" doc:name="Log error" doc:id="e36ac049-6f0a-45b4-aed1-76d2d448c9e4" message="#[payload]"/>
+     <set-variable value='#["500"]' doc:name="Set httpStatus" doc:id="ba8eebcc-ca04-4b99-aaec-c56e8271ad32" variableName="httpStatus"/>
+    </on-error-continue>
+   </error-handler>
+  </try>
+ </sub-flow>
+	<sub-flow name="salesforce-sys-cancel-appointment-subflow" doc:id="af5b6b2c-28f4-4fce-807d-5e6ac707c5c2" >
+		<logger level="INFO" doc:name="Logger before sf query call" doc:id="edc548ac-7690-42bd-b600-e62cca1d2e6b" message='#["Initiating Sf query call"]' />
+		<try doc:name="Try" doc:id="a6edd73d-d2e6-4bc1-973e-0ff518307385" >
+			<salesforce:query doc:name="Query" doc:id="3f8b99ca-7021-40a3-a203-6071736ede86" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[Select Id, Account.Firstname, Account.Lastname, Scheduled_Date__c, Scheduled_Time__c,Status from Case where Appointment_Unique_Identifier__c = ':appntId']]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	"appntId" : vars.appointmentId
+}]]]></salesforce:parameters>
+		</salesforce:query>
+			<choice doc:name="Choice" doc:id="2b848934-2a8f-4eab-9b49-1efb7c718e6b" >
+				<when expression="#[!isEmpty(payload)]">
+					<ee:transform doc:name="Map output response" doc:id="204f36ee-88db-4fbf-b9f7-26de03e445c8">
+			<ee:message>
+							<ee:set-payload resource="dw/cancelAppDetailsRespMap.dwl" />
+			</ee:message>
+						<ee:variables >
+						</ee:variables>
+		</ee:transform>
+				</when>
+				<otherwise >
+					<ee:transform doc:name="404 Error payload" doc:id="65672c1a-1ad4-499b-9301-e89168d0ed14" >
+						<ee:message >
+							<ee:set-payload resource="dw/cancelQueryError404.dwl" />
+						</ee:message>
+					</ee:transform>
+					<set-variable value='#["404"]' doc:name="Set httpStatus" doc:id="04cb9f3b-5d08-4ed5-8b5e-536a59c3ee6b" variableName="httpStatus" />
+					<logger level="ERROR" doc:name="Log error" doc:id="815c7081-899c-4b87-9d15-e09313055504" message="#[payload]" />
+				</otherwise>
+			</choice>
+			<logger level="INFO" doc:name="Logger after sf query call" doc:id="9103fc38-4c3b-4ee3-8c52-48dafc51b41c" message='#["Sf query call completed"]' />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="63bf073e-2820-4436-a011-6e0d32fbde33" >
+					<ee:transform doc:name="Error message" doc:id="6cc6c586-2be9-4759-8786-b355f53d5d81" >
+						<ee:message >
+							<ee:set-payload resource="dw/cancelQueryError500.dwl" />
+						</ee:message>
+					</ee:transform>
+					<logger level="ERROR" doc:name="Log error" doc:id="1b0c3f5e-c94c-4c6f-8be5-5c0c7ef4eed2" message="#[payload]" />
+					<set-variable value='#["500"]' doc:name="Set httpStatus" doc:id="477cce33-a24b-4c4b-8634-e847219eafca" variableName="httpStatus" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+   <sub-flow name="smsAppointment-subflow" doc:id="0a93d5a1-373e-4e71-94c6-c5a9cdaa5f37" >
+		<logger level="INFO" doc:name="SMS Appointment - Start" doc:id="f0c28a87-607a-48ad-9a90-86592ebd1953" message='#["Initiating SMS appointment request"]' />
+		<try doc:name="Try" doc:id="9a1b2c3d-4e5f-4678-8a1b-2c3d4e5f6a7b">
+			<http:request method="POST" doc:name="Send SMS with OAuth Token" doc:id="e5f6a7b8-c9da-4bde-9a0f-4a5b6c7d8e9f" config-ref="SMS_API_Request_Config" path="/{phoneNumber}/{program}/{templateTag}" sendCorrelationId="NEVER">
+				<http:headers ><![CDATA[#[{
+				"accept": "application/json",
+				"Content-Type": "application/json",
+				"X-Upstream-Env": "${secure::sms.api.upstreamEnv}"
+}]]]></http:headers>
+				<http:uri-params ><![CDATA[#[{
+				"phoneNumber": attributes.uriParams.phoneNumber,
+				"program": attributes.uriParams.program,
+				"templateTag": attributes.uriParams.templateTag
+}]]]></http:uri-params>
+			</http:request>
+			<logger level="INFO" doc:name="SMS Response" doc:id="f6a7b8c9-daeb-4cdf-9a0f-5a6b7c8d9eaf" message='#["SMS API response status: " ++ attributes.statusCode]' />
+			<ee:transform doc:name="Return SMS Success Response" doc:id="b2c3d4e5-f6a7-48bc-9d0e-1f2a3b4c5d6e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[200]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			<logger level="INFO" doc:name="SMS Sent Successfully" doc:id="c3d4e5f6-a7b8-49cd-9e0f-2a3b4c5d6e7f" message='#["SMS sent successfully"]' />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="e1f2a3b4-c5d6-4789-9a0b-1c2d3e4f5a6b">
+					<!-- surface the real upstream error body/status instead of the generic common-error-handler wrapper -->
+					<logger level="ERROR" doc:name="Log upstream SMS error" doc:id="f2a3b4c5-d6e7-4890-8a1b-2c3d4e5f6a7c" message='#["SMS upstream call failed with status " ++ (error.errorMessage.attributes.statusCode default attributes.statusCode) ++ " - " ++ error.description]' />
+					<ee:transform doc:name="Return Upstream Error Body" doc:id="a3b4c5d6-e7f8-4901-8b2c-3d4e5f6a7b8d">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+error.errorMessage.payload default { statusCode: "500", statusMessage: error.description }]]></ee:set-payload>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+(error.errorMessage.attributes.statusCode default 500) as Number]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+
+<sub-flow xmlns:core="http://www.mulesoft.org/schema/mule/core" name="cancelAppointment-subflow" doc:id="d28375e8-d4ae-446a-a163-42a546106a8a" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+		<ee:transform doc:name="Bulid Request" doc:id="fab871c1-110c-484a-b1cc-e3e2ca899e26">
+			<ee:message>
+				<ee:set-payload resource="dwl/cancelAppointment/buildRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[now()]" doc:name="Set Variable" doc:id="05a0ddf0-d80c-4716-afdc-8749c9475070" variableName="startTimeBeforeupdateSFcall"/>
+		<salesforce:update doc:name="Update" doc:id="0fbe3045-9ddc-4a72-8504-59f0e8a4ef4d" config-ref="Salesforce_Config" type="Case"/>
+		<logger level="INFO" doc:name="Logger" doc:id="367d1bb2-c984-4390-a6bc-c6f597657bf9" message='#[output application/java&#10;---&#10;"createAppointment time after SF Create Call is :  " ++ (now() - vars.startTimeBeforeupdateSFcall)]'/>
+		<choice doc:name="Cancel Performed?" doc:id="f5fd33bf-1f40-4cd7-8718-f1ab2288a4f0">
+			<when expression="#[payload.successful ~= true]">
+				<ee:transform doc:name="Response Payload" doc:id="a9f73440-4b43-47a6-aa54-4d2293d5d9ea">
+					<ee:message>
+						<ee:set-payload resource="dwl/cancelAppointment/cancelAppointmentResponse.dwl" />
+					</ee:message>
+		</ee:transform>
+				<set-variable value="#[201]" doc:name="Set Variable httpStatusCode=201" doc:id="57e75cf5-6ade-4e11-acd9-ae297a22f22f" variableName="httpStatus" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Not Found Payload" doc:id="62940d51-19a6-4147-a934-8a84a012c37f">
+					<ee:message>
+						<ee:set-payload resource="dwl/cancelAppointment/cancelAppointmentError.dwl" />
+					</ee:message>
+					
+				</ee:transform>
+				<set-variable variableName="httpStatus" value='#[%dw 2.0&#10;output application/json&#10;&#10;var sfCode = upper(payload.items[0].payload.errors[0].statusCode default "")&#10;&#10;var badRequestErrors = [&#10;    "INVALID_FIELD",&#10;    "INVALID_FIELD_FOR_INSERT_UPDATE",&#10;    "INVALID_CROSS_REFERENCE_KEY",&#10;    "INVALID_ID_FIELD",&#10;    "INVALID_TYPE",&#10;    "INVALID_OR_NULL_FOR_RESTRICTED_PICKLIST",&#10;    "REQUIRED_FIELD_MISSING",&#10;    "STRING_TOO_LONG",&#10;    "DUPLICATES_DETECTED",&#10;    "MALFORMED_ID",&#10;    "NUMBER_OUTSIDE_VALID_RANGE",&#10;    "FIELD_CUSTOM_VALIDATION_EXCEPTION",&#10;    "INVALID_EMAIL_ADDRESS",&#10;    "INVALID_PHONE_NUMBER",&#10;    "CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY"&#10;]&#10;&#10;---&#10;{&#10;    statusCode:&#10;        if (&#10;            (sfCode contains "INVALID")&#10;            or&#10;            (badRequestErrors contains sfCode)&#10;        )&#10;            400&#10;        else if (&#10;            sfCode == "ENTITY_IS_DELETED"&#10;            or sfCode == "INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY"&#10;        )&#10;            404&#10;        else&#10;            500,&#10;&#10;    message: payload.items[0].payload.errors[0].message default null&#10;}]' />
+				<set-variable
+    variableName="httpStatus"
+    value="#[payload.statusCode]"
+    doc:name="Set Variable httpStatus"/>
+    <set-variable variableName="errorType" value='#[if ((payload.statusCode default 500) == 400)
+                "HTTP:BAD_REQUEST"
+              else
+                "HTTP:INTERNAL_SERVER_ERROR"]' doc:name="Set Variable ErrorType"/>
+			</otherwise>
+			</choice>
+	
+</sub-flow>
+    
+    
+</mule>

@@ -1,0 +1,6 @@
+name: mrcrm-mulesoft-gpd-exp-api
+appType: mira-mule-app
+serviceName: mrcrm-mulesoft-gpd-exp-api # Used in deployments
+deploymentType: anypoint                       # This can be azure or hcc.
+team: mira
+javaVersion: 21

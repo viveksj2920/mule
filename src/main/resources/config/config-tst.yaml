@@ -1,0 +1,36 @@
+salesforce.api:
+  host: "uhcmira--qapro1.sandbox.my.salesforce.com"
+  basePath: "/services/data/v50.0/sobjects"
+  queryBasePath: "/services/data/v50.0/query"
+  
+oauth.jwt:
+  consumerKey: "3MVG9zNEjUHDE8.X6js6u9rWO_puY_reS22UVrvuDUH1QS92lENS484SpYsfyXtC64FnRBNSJX6SyuuIRFQqP"
+  principal: "mule.integration.user@uhc.com.uhcmira.qapro1"
+  tokenHostOnly: "https://test.salesforce.com" #"https://uhcmira--qaorg.my.salesforce.com"
+  keystorePath: "keys/govt-prg-crm-apinp.optum.com.jks"
+  keystorePassword: "![3qYbC5sfKc/3UMFVvC83Z/jzNvW4gzXVLcF6vScpreM=]"
+  privateKeyAlias: "govt-prg-crm-apinp.optum.com"
+  privateKeyPassword: "![3qYbC5sfKc/3UMFVvC83Z/jzNvW4gzXVLcF6vScpreM=]"   
+  
+# AUTODISCOVERY    
+api:
+  id: "20493452"   
+
+# Booking lead time in hours applied to slot availability and appointment submission.
+appointment:
+  leadTimeHours: "48"
+
+
+# SMS API OAuth Configuration
+sms:
+  oauth:
+    host: "api-stg.uhg.com"
+    basePath: "/"
+    clientId: "![/4yIaJmaoHlRKzF+YE/8XSSoSaaRFZzM32BpkM4ipOBpsI55Z+syCEUaFL5RdPga]"
+    clientSecret: "![BeoCKqnnaE6Q/Px4vY4jQbzsV5lG5cZyrJHZuHeEy3/VGCoFztlUvciFA498oLeg]"
+    scope: "https://api.uhg.com/.default"
+    tokenUrl: "https://api-stg.uhg.com/oauth2/token"
+  api:
+    host: "api-stg.uhg.com"
+    basePath: "/api/consumer/gpd-sms-mgr/v1.0/sms/outbound"
+    upstreamEnv: "stage"

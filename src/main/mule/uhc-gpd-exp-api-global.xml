@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:oauth="http://www.mulesoft.org/schema/mule/oauth" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd  http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/oauth http://www.mulesoft.org/schema/mule/oauth/current/mule-oauth.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+    <apikit:config name="gpd-experience-api-config" api="gpd-experience-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <global-property doc:name="Global Property" doc:id="368be21e-1b26-4b30-b4f6-f6201b6356a6" name="mule.secure-key" value="non-prod-enc-key" />
+    <global-property doc:name="Global Property" doc:id="8228bb8f-cad1-4966-96ad-2146f5c294c4" name="mule.env" value="tst" />
+    <http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d2596782-d780-4aeb-8c1f-5e2285b17d93" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config> 
+    <import doc:name="Import" doc:id="4dfdd5e0-5068-433d-803a-afa77b064677" file="common-error-handler.xml" />
+    <import doc:name="Import" doc:id="36b56c18-95f7-4d17-bec6-764824bef47e" file="common-logging.xml" />
+    <import doc:name="Import" doc:id="693522cb-3f2a-4ad6-832f-b599f057bcea" file="notification/common-notification.xml" />
+    <configuration-properties doc:name="Configuration properties" doc:id="49cc89d9-759a-4de9-ad99-b304258d5d62" file="config/config-common.yaml" />
+	<secure-properties:config name="Secure_Properties_Config2" doc:name="Secure Properties Config" doc:id="681dca91-322a-433b-895b-14226baf4eec" file="config/config-${mule.env}.yaml" key="${mule.secure-key}" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="af25b180-ec65-4c3a-9384-6a4c93245ac6" >
+				<salesforce:jwt-connection consumerKey="${secure::oauth.jwt.consumerKey}" keyStore="${secure::oauth.jwt.keystorePath}" storePassword="${secure::oauth.jwt.keystorePassword}" certificateAlias="${secure::oauth.jwt.privateKeyAlias}" principal="${secure::oauth.jwt.principal}" tokenEndpoint="${secure::oauth.jwt.tokenHostOnly}/services/oauth2/token" connectionTimeout="8" loginRequestTimeout="8">
+			<reconnection failsDeployment="true" />
+		</salesforce:jwt-connection>
+	</salesforce:sfdc-config>
+	<http:request-config name="SMS_OAuth_Request_Config" doc:name="HTTP Request configuration for SMS OAuth" doc:id="d9c5e1a6-5c2b-4d3f-8a1b-9c2d3e4f5a6b" basePath="${secure::sms.oauth.basePath}">
+		<http:request-connection host="${secure::sms.oauth.host}" protocol="HTTPS">
+			<reconnection failsDeployment="true">
+				<reconnect />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="SMS_API_Request_Config" doc:name="HTTP Request configuration for SMS API" doc:id="e0d6f2b7-6c3e-4e0f-9a2c-0d3e4f5a6b7c" basePath="${secure::sms.api.basePath}">
+		<http:request-connection host="${secure::sms.api.host}" protocol="HTTPS">
+			<reconnection failsDeployment="true">
+				<reconnect />
+			</reconnection>
+			<http:authentication>
+				<oauth:client-credentials-grant-type encodeClientCredentialsInBody="true" clientId="${secure::sms.oauth.clientId}" clientSecret="${secure::sms.oauth.clientSecret}" scopes="${secure::sms.oauth.scope}" tokenUrl="${secure::sms.oauth.tokenUrl}" />
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	<api-gateway:autodiscovery apiId="${secure::api.id}" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="6d3bc391-a7ba-4e63-aad6-6b8c887e6a04" flowRef="gpd-experience-api-main" />
+</mule>

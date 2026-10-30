@@ -1,0 +1,20 @@
+#NEVER INCLUDE SENSITIVE INFORMATION ON THIS FILE.
+#USERNAME, PASSWORD, KEYS SHOULD BE DEFINED ON ENVIRONMENT SPECIFIC FILE (SECURE FILE)
+
+#json logger configuration
+json:
+  logger:
+    mask-fields: "SSN"
+# If you want to hidden json logger, set the priority to DEBUG. When you want to show it, change the runtime configuration using the category and the priority = DEBUG    
+#    error-category: "org.mule.extension.jsonlogger.JsonLogger"
+#    logging-category: "org.mule.extension.jsonlogger.JsonLogger"
+#    priority: "INFO"
+
+api:
+  version: "v1.0"
+  name: "uhc-mulesoft-gpd-exp-api"
+  baseURL: "/mr/gpd/exp/${api.version}"
+  
+http:
+  port : '8081'  
+

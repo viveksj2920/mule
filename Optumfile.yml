@@ -1,0 +1,8 @@
+apiVersion: v1
+metadata:
+  askId: UHGWM110-000389
+  caAgileId: 382594581812d
+  projectKey: com.optum.mrcrm-mulesoft:uhc-live-person-exp-api
+  projectFriendlyName: uhc-live-person-exp-api
+  componentType: code
+  targetQG: GATE_00

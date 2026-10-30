@@ -1,0 +1,497 @@
+#%RAML 1.0
+
+title: GPD Experience API
+baseUri: https://govt-prg-crm-stg-api.optum.com/mr/gpd/exp/v1.0
+(amf-serverDescription): Development server for M&R LivePerson Experience API
+(amf-servers):
+  -
+    url: https://govt-prg-crm-dev-api.optum.com/mr/gpd/exp/v1.0
+    description: Dev server for M&R gpd Experience API
+  -
+    url: https://govt-prg-crm-tst-api.optum.com/mr/gpd/exp/v1.0
+    description: Test server for M&R gpd Experience API
+  -
+    url: https://govt-prg-crm-stg-api.optum.com/mr/gpd/exp/v1.0
+    description: Stage server for M&R gpd Experience API
+  -
+    url: https://govt-prg-crm-trn-api.optum.com/mr/gpd/exp/v1.0
+    description: Training server for M&R gpd Experience API
+  -
+    url: https://govt-prg-crm-api.optum.com/mr/gpd/exp/v1.0
+    description: Prod server for M&R gpd Experience API
+description: Services to provide integration between GPD AIML and Mira CRM (Salesforce)
+version: "1.0"
+(amf-termsOfService): https://hcp.uhg.com/
+(amf-contact):
+  name: MRCRM API Support
+  email: GPSCRM_Support@ds.uhc.com
+  
+types:
+  AppointmentAvailabilityRecord:
+    type: object
+    additionalProperties: false
+    properties:
+      appointmentDate:
+        type: date-only
+        required: true
+        description: Value mapped from Appointment_Date__c.
+      appointmentTime:
+        type: string
+        required: true
+        description: Value mapped from Appointment_time__c in the requested timezone context.
+      plannedSlotCapacity:
+        type: integer
+        required: true
+        description: Value mapped from Planned_Slot__c.
+  AppointmentAvailabilitySuccessResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+        enum: [ success ]
+      message:
+        type: string
+      results:
+        type: AppointmentAvailabilityRecord[]
+  ErrorResponse:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string
+        enum: [ failure ]
+      message:
+        type: string
+      details?:
+        type: string
+  CancelAppointmentRequestType:
+    type: object
+    properties:
+      recordid:
+        description: Salesforce Case Id
+        example:
+          strict: false
+          value: 500ct00000VvN65AAF
+        type: string
+        required: true
+
+      Status:
+        description: Appointment Status
+        enum:
+          - Cancelled
+ 
+        example:
+          strict: false
+          value: Cancelled
+          
+        type: string
+        required: true
+
+      CancelReason:
+        description: Reason for cancelling the appointment
+        enum:
+          - No longer Interested
+          - Already enrolled
+          - Unable to meet
+          - Owner Deactivated
+          - Other
+          - No longer interested
+        example:
+          strict: false
+          value: No longer Interested
+        type: string
+        required: true
+      RequestSource:
+        description: Reason for request source
+        enum:
+          - Email
+          - SMS
+          - Agent
+        type: string
+        required: true  
+
+  CancelAppointmentSuccessResponseType:
+    type: object
+    properties:
+      statusCode:
+        example:
+          strict: false
+          value: "200"
+        type: string
+        required: true
+
+      statusMessage:
+        example:
+          strict: false
+          value: Appointment has been cancelled.
+        type: string
+        required: true
+
+      recordId:
+        description: Cancelled Appointment Record Id
+        example:
+          strict: false
+          value: 500ct00000VvN65AAF
+        type: string
+        required: true  
+        
+
+  CreateAppointmentRequestType:
+    type: object
+    properties:
+      firstName:
+        description: Customer First Name
+        example:
+          strict: false
+          value: John
+        type: string
+        required: true
+
+      lastName:
+        description: Customer Last Name
+        example:
+          strict: false
+          value: Smith
+        type: string
+        required: true
+
+      emailAddress:
+        description: Customer Email Address
+        example:
+          strict: false
+          value: john.smith@email.com
+        type: string
+        required: true
+
+      zipCode:
+        description: Zip Code
+        example:
+          strict: false
+          value: "32765"
+        type: string
+        required: true
+
+      dateOfBirth:
+        description: Date Of Birth
+        example:
+          
+          strict: false
+          value: "04/21/1971"
+        type: string
+        required: true
+
+      medicareNumber?:
+        description: Medicare Number
+        example:
+          strict: false
+          value: 1EG4TE5MK72
+        type: string
+
+      phoneNumber:
+        description: Phone Number
+        example:
+          strict: false
+          value: "6478290012"
+        type: string
+        required: true
+
+      phoneType:
+        description: Phone Type
+        example:
+          strict: false
+          value: Mobile
+        type: string
+        required: true
+
+      consentMobileNumber?:
+        description: Consent Mobile Number
+        example:
+          strict: false
+          value: "6478290012"
+        type: string
+
+      appointmentDate:
+        description: Appointment Date
+        example:
+          strict: false
+          value: "07/18/2026"
+        type: string
+        required: true
+
+      appointmentTime:
+        description: Appointment Time
+        example:
+          strict: false
+          value: "10:30:00"
+        type: string
+        required: true
+
+      mcid?:
+        description: MCID
+        example:
+          strict: false
+          value: MC12345
+        type: string
+
+      uuid?:
+        description: UUID
+        example:
+          strict: false
+          value: UUID12345
+        type: string
+
+      pscid?:
+        description: PSCID
+        example:
+          strict: false
+          value: PSC12345
+        type: string
+
+      pageName?:
+        description: Page Name
+        example:
+          strict: false
+          value: MedSuppLandingPage
+        type: string
+
+      smsConsent?:
+        description: SMS Consent
+        example:
+          strict: false
+          value: false
+        type: boolean
+        
+      cancelUrl:
+        description: Portal-specific cancellation URL. Must be a valid HTTP/HTTPS URL ending with .html
+        example: 
+          strict: false
+          value: false
+        type: string
+        pattern: ^https?:\/\/.*\.html$
+        
+
+      marketingTexts?:
+        description: Marketing Text Consent
+        example:
+          strict: false
+          value: false
+        type: boolean
+
+      appointmentTimeZone?:
+        description: Appointment Time Zone
+        example:
+          strict: false
+          value: CT
+        type: string
+
+  CreateAppointmentSuccessResponseType:
+    type: object
+    properties:
+      statusCode:
+        example:
+          strict: false
+          value: "201"
+        type: string
+        required: true
+
+      statusMessage:
+        example:
+          strict: false
+          value: Appointment has been created.
+        type: string
+        required: true
+
+      appointmentID?:
+        description: Created Appointment ID
+        example:
+          strict: false
+          value: AIR-000001
+        type: string
+
+  ErrorResponseType:
+    type: object
+    properties:
+      statusCode:
+        example:
+          strict: false
+          value: "500"
+        type: string
+        required: true
+
+      statusMessage:
+        example:
+          strict: false
+          value: Internal Server Error
+        type: string
+        required: true
+        
+  SendSmsRequestType:
+    type: object
+    additionalProperties: true
+
+  SendSmsSuccessResponseType:
+    type: object
+    additionalProperties: true
+        
+/calls/{ucid}:
+  get:
+    responses:
+      "200":
+        description: Created
+        body:
+          application/json: 
+
+/createAppointment:
+  post:
+    body:
+      application/json: CreateAppointmentRequestType
+    responses:
+      "201":
+        description: Created
+        body:
+          application/json: CreateAppointmentSuccessResponseType
+
+      "400":
+        description: Request rejected because the requested appointment date and time is inside the configured booking lead time.
+        body:
+          application/json:
+            example:
+              errorType: BAD_REQUEST
+              errorCode: 400
+              errorDescription: Appointment can't be scheduled for the given lead time of 48
+              errorMessage: leadTimeNotMet
+              rfcName: Bad Request
+
+      "500":
+        description: Error response
+        body:
+          application/problem+json: ErrorResponseType
+          
+/appointments/availability:
+  get:
+    description: Retrieves planned slot capacity from CDAS_Slot_Master__c for the supplied date range and timezone context. A configurable booking lead time is applied first - when the requested startDate carried at the current Central time is earlier than the current Central time plus the lead time, the effective start becomes the current Central time plus the lead time, otherwise startDate is used as is. Slots earlier than that cutoff are never returned, including slots falling earlier in the day on the cutoff date. The response echoes the effective start date as startDate. Requests with invalid date formats, missing required parameters, a startDate greater than endDate, or an effective start date pushed beyond endDate by the lead time must be rejected.
+    queryParameters:
+      timeZone:
+        type: string
+        required: true
+        example: ct
+        description: Timezone context used when processing and returning slot availability data.
+      startDate:
+        type: date-only
+        required: true
+        example: 2026-07-02
+        description: Inclusive start date for filtering Appointment_Date__c.
+      endDate:
+        type: date-only
+        required: true
+        example: 2026-08-02
+        description: Inclusive end date for filtering Appointment_Date__c. Must be greater than or equal to startDate.
+    responses:
+      "200":
+        description: Request processed successfully. Returns matching slot records, or an empty result set when no slots are available in the requested date range.
+        body:
+          application/json:
+      "400":
+        description: Request validation failed because required parameters are missing, the date range is invalid, the date format is invalid, or the booking lead time moves the effective start date beyond endDate.
+        body:
+          application/json:
+            example:
+              errorType: BAD_REQUEST
+              errorCode: 400
+              errorDescription: Booking lead time of 48 hours moves the start date to a day which is after the requested endDate 2026-08-18
+              errorMessage: leadTimeExceedsDateRange
+              rfcName: Bad Request
+            
+      "500":
+        description: The system encountered an error while querying CDAS_Slot_Master__c.
+        body:
+          application/json:
+            example:
+              status: failure
+              message: Failed to retrieve slot availability
+              details: Error while querying CDAS_Slot_Master__c
+/cancelAppointmentDetails/{appointment-id}:
+  get:
+    description: Retrieves appointment details from sf using appointmentId
+    responses:
+      "200":
+        description: Success
+        body:
+          application/json:
+      "404":
+        description: Not Found
+        body:
+          application/json:
+      "500":
+        description: Error response
+        body:
+          application/json:
+/cancelAppointment:
+  post:
+    displayName: Cancel Appointment
+    description: Cancels an existing appointment in Salesforce.
+    body:
+      application/json:
+        type: CancelAppointmentRequestType
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: CancelAppointmentSuccessResponseType
+
+      400:
+        body:
+          application/json:
+            
+
+      500:
+        body:
+          application/json:
+                     
+                   
+/smsAppointment/{phoneNumber}/{program}/{templateTag}:
+  uriParameters:
+    phoneNumber:
+      description: Customer phone number, must start with "+" followed by country code and number
+      type: string
+      example: "+919569789032"
+    program:
+      description: Originating program/system of the SMS request
+      type: string
+      example: "SALESFORCE"
+    templateTag:
+      description: SMS template identifier
+      type: string
+      example: "APPT_REM"
+  post:
+    displayName: Send Appointment SMS
+    description: >
+      Sends an appointment reminder SMS to a customer using OAuth2 token-based authentication.
+    
+    body:
+      application/json:
+        type: SendSmsRequestType
+
+    responses:
+      200:
+        description: SMS sent successfully
+        body:
+          application/json:
+            type: SendSmsSuccessResponseType
+
+      400:
+        description: Bad request - invalid parameters
+        body:
+          application/json:
+            example:
+              statusCode: "400"
+              statusMessage: Invalid format
+      500:
+        description: Internal server error
+        body:
+          application/json:
+            example:
+              statusCode: "500"
+              statusMessage: Failed to send SMS

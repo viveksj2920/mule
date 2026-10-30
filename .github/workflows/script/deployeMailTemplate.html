@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <style>
+         @font-face
+         {font-family:"Cambria Math"}
+      @font-face
+         {font-family:Calibri}
+      @font-face
+         {font-family:Aptos}
+      p.MsoNormal,  li.MsoNormal,  div.MsoNormal
+         {margin:0in;
+         font-size:11.0pt;
+         font-family:"Aptos",sans-serif}
+      a:link,  span.MsoHyperlink
+         {color:#467886;
+         text-decoration:underline}
+      p.MsoListParagraph,  li.MsoListParagraph, div.MsoListParagraph
+         {margin-top:0in;
+         margin-right:0in;
+         margin-bottom:0in;
+         margin-left:.5in;
+         font-size:11.0pt;
+         font-family:"Aptos",sans-serif}
+       span.MsoSmartlink
+         {color:blue;
+         background:#F3F2F1;
+         text-decoration:underline}
+      .MsoChpDefault
+         {font-size:10.0pt}
+      @page WordSection1
+         {margin:1.0in 1.0in 1.0in 1.0in}
+
+      ol
+         {margin-bottom:0in}
+      ul
+         {margin-bottom:0in}
+
+         body, .container-table {
+         font-family: 'Enterprise Sans Bold Heading', Helvetica, Arial, sans-serif;
+         /*background-color: #f3f3f3;*/
+         margin: 0;
+         padding: 0;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+         }
+         .email-container {
+         max-width: 768px;
+         padding: 20px;
+         background-color: #ffffff;
+         border-radius: 5px;
+         }
+         .header {
+         text-align: center;
+         padding-bottom: 20px;
+         border-bottom: 2px solid #c4c4c4;
+         }
+         .header img {
+         width: 50px;
+         }
+         .sub-header {
+         text-align: center;
+         color: #003a8d;
+         margin-bottom: 20px;
+         }
+         .content {
+         line-height: 1.5;
+         color: #5A5A5A;
+         }
+         .content a {
+         color: #337ab7;
+         text-decoration: none;
+         font-size: 14px;
+         }
+         .footer {
+         margin-top: 30px;
+         text-align: center;
+         color: #4b4d4f;
+         border-top: 2px solid #c4c4c4;
+         padding-top: 20px;
+         font-family: 'Open Sans', Arial, sans-serif;
+         font-size: 12px;
+         }
+         .email-container table {
+         border-collapse: collapse;
+         margin-top: 5px;
+         }
+         .email-container table td,  .email-container table th {
+         padding: 3px;
+         border: 1px solid #dadada;
+         }
+         .span-logo{
+         margin-left: -5px !important;
+         }
+      </style>
+   </head>
+   <body>
+      <!--[if mso]>
+      <table role="presentation" width="100%"  cellpadding="0" cellspacing="0" border="0">
+         <tr>
+            <td style="background-color: #f3f3f3; padding: 20px;">
+               <![endif]-->
+               <div style="background-color: #f3f3f3; padding: 20px;">
+                  <table role="presentation" class="email-container" width="768" cellpadding="0" cellspacing="0" border="0" align="center" style="max-width: 768px; width: 100%; background-color: #ffffff; border-radius: 5px;">
+                     <tr>
+                        <td class="header" style="padding-bottom: 20px; border-bottom: 2px solid #c4c4c4; text-align: center;">
+                           <span class="span-logo" style="display:inline;font-weight:bold;color:#ff612b;font-size:35px;margin-left:-5px;font-style:oblique;">MIRA Integration</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="sub-header" style="text-align: center; color: #003a8d; margin-bottom: 20px;">
+                           <h2 style="margin-bottom:0;margin-top:0;"><span style="font-size:35px;">var_env_icon</span> var_env_name var_deployment_type_text <span style="font-size:35px;">var_deployment_type_icon</span></h2>
+                           <h3 style="margin-top:0;margin-bottom:0;"><span style="font-size:35px;">var_deployment_status_icon</span> var_deployment_status_header_text <span style="font-size:35px;">var_deployment_status_icon</span> </h3>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="content" style="color: #5A5A5A;">
+                           <p>The deployment for <strong><a>var_app_name</a></strong> from the <strong><a href="var_branch_url">var_branch_name</a></strong> has var_deployment_message.</p>
+                           <p>To check the Deployment status Login to Anypoint Platform <a href="var_mule_deploy_status_url">click here</a>. For the build logs in GitHub <a href="var_ghactions_output_url">click here</a>.
+                           </p>
+
+                           
+               </div>
+               </td>
+               </tr>
+               <tr>
+               <td class="footer" style="margin-top: 30px; text-align: center; color: #4b4d4f; border-top: 2px solid #c4c4c4; padding-top: 20px; font-family: 'Open Sans', Arial, sans-serif; font-size: 12px;">
+               <p>Optum | Plaid | MIRA Integration</p>
+               </td>
+               </tr>
+               </table>
+               </div>
+               <!--[if mso]>
+            </td>
+         </tr>
+      </table>
+      <![endif]-->
+   </body>
+</html>

@@ -1,0 +1,22 @@
+gpd.sys.api:
+  host: "govt-prg-crm-stg-api.optum.com"
+  port: "80"
+  path: "/mr/salesforce/crm/sys/v1.0"
+
+# Booking lead time in hours applied to slot availability and appointment submission.
+appointment:
+  leadTimeHours: "48"
+
+# SMS API OAuth Configuration
+sms:
+  oauth:
+    host: "api-dev.uhg.com"
+    basePath: "/"
+    clientId: "![YOUR_CLIENT_ID_ENCRYPTED]"
+    clientSecret: "![YOUR_CLIENT_SECRET_ENCRYPTED]"
+    scope: "https://api.uhg.com/.default"
+    tokenUrl: "https://api-dev.uhg.com/oauth2/token"
+  api:
+    host: "api-dev.uhg.com"
+    basePath: "/api/consumer/gpd-sms-mgr/v1.0/sms/outbound"
+    upstreamEnv: "dev"

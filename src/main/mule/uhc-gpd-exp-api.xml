@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <flow name="gpd-experience-api-main">
+        <http:listener path="${api.baseURL}/*" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <flow-ref doc:name="common-logging_startFlow" doc:id="c3506c65-ac02-493e-91ee-a3c8aa3cebee" name="common-logging_startFlow" />
+        <apikit:router config-ref="gpd-experience-api-config" />
+        <flow-ref doc:name="common-logging_endFlow" doc:id="1a8503b2-d83e-4355-a013-c5606d89fb88" name="common-logging_endFlow" />
+        <error-handler ref="common-error-handler" />
+    </flow>
+    <flow name="get:\calls\(ucid):gpd-experience-api-config">
+        <flow-ref doc:name="salesforce-calls-api-implFlow-getCallByUCID" doc:id="c8791d72-99d0-4081-91fa-42bf39b0b354" name="salesforce-calls-api-implFlow-getCallByUCID" />
+    </flow>
+    <flow name="post:\createAppointment:application\json:gpd-experience-api-config">
+        <set-variable value="#[now()]" doc:name="Set Variable" doc:id="1e09d30e-4e76-462a-b224-fe4e11c2b794" variableName="startTimeBeforeCreatecall" />
+        <flow-ref doc:name="Post Create New Appointment " doc:id="4c620512-1056-467a-b0a6-04b4a9106fd2" name="createAppointment-subflow" />
+        <logger level="INFO" doc:name="Logger" doc:id="940fcc34-3ceb-4996-b63c-c3ac58d00bf3" message="#[output application/java&#xA;---&#xA;&quot;createAppointment end to end elapsed time is :  &quot; ++ (now() - vars.startTimeBeforeCreatecall)]" />
+    </flow>
+    <flow name="get:\appointments\availability:gpd-experience-api-config">
+        <logger level="INFO" doc:name="Logger Flow start" doc:id="68eae4f6-4fbe-4441-bebd-b0756fe5b27c" message="#[&quot;Appointments availability implementation flow starts&quot;]" />
+        <set-variable value="${secure::appointment.leadTimeHours}" doc:name="Set leadTimeHours" doc:id="3f8c1a05-72e9-4d16-b4a7-8c05e19f2a63" variableName="leadTimeHours" />
+        <ee:transform doc:name="Set vars">
+            <ee:message />
+            <ee:variables>
+                <ee:set-variable resource="dw/vQueryParams.dwl" variableName="vQParams" />
+            </ee:variables>
+        </ee:transform>
+        <choice doc:name="Choice" doc:id="8712013c-53bc-4ef8-9556-0fb59ccb28fa">
+            <when expression="#[vars.vQParams.startDate &gt; vars.vQParams.endDate]">
+                <ee:transform doc:name="Error message 400" doc:id="7d971ae7-465c-4dd7-9414-53947ceaa649">
+                    <ee:message>
+                        <ee:set-payload resource="dw/errorResponse400.dwl" />
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[&quot;400&quot;]" doc:name="Set httpStatus" doc:id="6faa6266-6fe0-4910-ac6a-285fb48b0110" variableName="httpStatus" />
+            </when>
+            <when expression="#[vars.vQParams.effectiveStartDate &gt; vars.vQParams.endDate]">
+                <ee:transform doc:name="Lead time range error 400" doc:id="2c6f9b41-8e0d-47a3-95b7-4f1a8d3c60e2">
+                    <ee:message>
+                        <ee:set-payload resource="dw/leadTimeRangeError.dwl" />
+                    </ee:message>
+                </ee:transform>
+                <set-variable value="#[&quot;400&quot;]" doc:name="Set httpStatus lead time range" doc:id="9d5b1e78-3a24-4c60-b8f1-6e0c2a7d5943" variableName="httpStatus" />
+                <logger level="INFO" doc:name="Log lead time range rejection" doc:id="7e2a4c90-15d8-4b73-a6e2-0c9f3b81d47a" message="#[&quot;Availability rejected: lead time of &quot; ++ vars.vQParams.leadTimeHours ++ &quot; hours moves startDate to &quot; ++ vars.vQParams.effectiveStartDate ++ &quot;, past endDate &quot; ++ vars.vQParams.endDate]" />
+            </when>
+            <otherwise>
+                <flow-ref doc:name="salesforce-sys-slot-availability-subflow" doc:id="34d80e87-b929-414a-8c68-61a3fe773ce6" name="salesforce-sys-slot-availability-subflow" />
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="get:\cancelAppointmentDetails\(appointment-id):gpd-experience-api-config">
+		<logger level="INFO" doc:name="Logger Flow start" doc:id="91fd73b6-4622-46c9-8033-b6918e0ece2c" message='#["Fetch cancel-appointment details implementation flow starts"]' />
+		<ee:transform doc:name="Set vars" doc:id="bbe03f87-3292-467b-a323-221dc0642170">
+			<ee:variables>
+				<ee:set-variable variableName="appointmentId"><![CDATA[attributes.uriParams.'appointment-id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="salesforce-sys-cancel-appointment-subflow" doc:id="3f91e34e-3647-47b2-84d3-797bb2b46918" name="salesforce-sys-cancel-appointment-subflow"/>
+		<logger level="INFO" doc:name="Logger flow ends" doc:id="3291acca-8430-4577-a4f2-8408107bc506" message='#["Fetch cancel-appointment details implementation flow ends"]' />
+    </flow>
+        <flow name="post:\cancelAppointment:application\json:gpd-experience-api-config">
+		<flow-ref doc:name="Post Cancel Appointment " doc:id="426b919e-8004-40be-95cf-6238ce0ca672" name="cancelAppointment-subflow"/>
+    </flow>
+     <flow name="post:\smsAppointment\(phoneNumber)\(program)\(templateTag):application\json:gpd-experience-api-config">
+		<flow-ref doc:name="Post SMS Appointment " doc:id="844bf146-63c5-41db-af37-2827631c97e8" name="smsAppointment-subflow"/>
+    </flow>
+</mule>
+

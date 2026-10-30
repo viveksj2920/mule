@@ -1,0 +1,20 @@
+name: MIRA_Integration_CICD
+permissions:
+  contents: read
+  packages: read
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target deployment environment'
+        required: true
+        type: choice
+        options:
+          - test
+          - training
+          - prod
+
+jobs:
+  cicd:
+    uses: uhc-tech-medicare-retiree-common/gpd-actions-lib/.github/workflows/cicd-start.yaml@96c75a74d7a416133d0e9b69d5d0da11b36f5a15 # main
+    secrets: inherit
